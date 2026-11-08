@@ -1,0 +1,22 @@
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS sources (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  uri TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  content_hash TEXT NOT NULL,
+  embedding_model TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS chunks (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  source_id BIGINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+  position INTEGER NOT NULL CHECK (position >= 0),
+  content TEXT NOT NULL CHECK (length(trim(content)) > 0),
+  embedding VECTOR(384) NOT NULL,
+  UNIQUE (source_id, position)
+);
+
+COMMIT;

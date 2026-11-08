@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.cache/
+documents/
+data/
+.git/
+.idea/
+.claude/
+.mcp.json
+.env
+.env.*
+*.log
+learning-history/
+output/

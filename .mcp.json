@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "aiven-rag": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "compose",
+        "--project-directory",
+        "C:/Users/sapir/WebstormProjects/RAG_MCP",
+        "run",
+        "--rm",
+        "--no-deps",
+        "-T",
+        "server"
+      ]
+    }
+  }
+}

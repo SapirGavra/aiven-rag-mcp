@@ -1,0 +1,32 @@
+{
+  "name": "aiven-rag-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Aiven RAG MCP home assignment, built step by step in TypeScript",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts",
+    "check": "tsc --noEmit",
+    "model:download": "tsx scripts/prepare-model.ts",
+    "scan": "tsx scripts/scan-repository.ts",
+    "ingest:repo": "tsx scripts/ingest-repository.ts",
+    "smoke": "npm run build && node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.3.2",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "pg": "8.23.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@types/pg": "8.23.1",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}
