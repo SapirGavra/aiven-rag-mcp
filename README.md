@@ -93,26 +93,68 @@ Logs go to stderr; stdout is reserved for MCP messages.
 
 ## Example session
 
-Ask Claude to call `ingest` with:
+Run this example after connecting the MCP server. Paste the prompts below into
+the Claude Code conversation, not PowerShell. Loading the Aiven corpus is not
+required for this example.
 
-```json
+### Step 1: Store a document
+
+Paste this entire message into Claude Code:
+
+```text
+Use the aiven-rag ingest tool with exactly these arguments:
 {
   "uri": "demo://example",
   "title": "Fictional example",
   "text": "In this fictional example, the launch code is BLUE-742."
 }
+Show the raw tool result.
 ```
 
-Expect `status: "ingested"`, a source ID and one chunk. Then ask:
+On first ingestion, expect a result like this (the source ID will vary):
+
+```json
+{
+  "source_id": "1",
+  "uri": "demo://example",
+  "title": "Fictional example",
+  "chunks_count": 1,
+  "status": "ingested"
+}
+```
+
+If the exact document already exists, `status` will be `skipped` instead.
+
+### Step 2: Retrieve the answer
+
+Paste this message into Claude Code:
 
 ```text
-Use only the aiven-rag search tool to find the launch code in the fictional
-example. Include the supporting passage and source URI.
+Use the aiven-rag search tool with exactly these arguments:
+{"query":"What is the launch code in the fictional example?","limit":5}
+
+Answer using only the retrieved passages. Include the supporting passage and
+source URI. If the passages do not contain the answer, say so.
 ```
 
-Expect `BLUE-742` with source `demo://example`. Repeating the same ingestion
-returns `skipped`. Changing the text while keeping the URI updates the existing
-source and replaces its chunks.
+Expected answer content (Claude's wording may vary):
+
+```text
+The launch code is BLUE-742.
+Source: demo://example
+Supporting passage: "In this fictional example, the launch code is BLUE-742."
+```
+
+The search tool returns passages and similarity scores; Claude writes the answer
+above. Up to five chunks may be returned, including unrelated passages if other
+documents are present. The code and supporting source are the success criteria,
+not an exact similarity score or identical answer wording.
+
+### Optional: Check repeated ingestion
+
+Send the Step 1 prompt again without changing any fields. Expect `status:
+"skipped"` and the same `source_id`. Changing the text while keeping the URI
+updates the existing source and replaces its chunks.
 
 ## Tools and supported inputs
 
