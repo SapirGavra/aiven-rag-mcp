@@ -23,11 +23,12 @@ Build the server image:
 docker compose build server
 ```
 
-Download the model once. This command makes the model directory writable for
-this invocation; normal server runs mount it read-only:
+Create the model directory and download the model once. The directory is mounted
+writable so the preparation script can save the downloaded files:
 
 ```powershell
-docker compose run --rm --no-deps --volume "./.cache/models:/app/.cache/models" server node --import tsx scripts/prepare-model.ts
+New-Item -ItemType Directory -Force -Path ".cache/models"
+docker compose run --rm --no-deps server node --import tsx scripts/prepare-model.ts
 ```
 
 Start the database and wait until it accepts connections:

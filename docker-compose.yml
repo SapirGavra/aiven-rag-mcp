@@ -9,7 +9,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./.cache/models:/app/.cache/models:ro
+      - ./.cache/models:/app/.cache/models
       - ./documents:/app/documents:ro
       - ./data:/app/data:ro
       - ./data/reports:/app/data/reports
