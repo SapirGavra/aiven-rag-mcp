@@ -309,6 +309,45 @@ Demo documents remain in the database unless explicitly removed.
 
 ## Design and code structure
 
+```mermaid
+flowchart TB
+    Claude["Claude Code: calls tools and writes the final answer"]
+
+    subgraph Server["Docker container: MCP server"]
+        MCP["MCP tools: ingest, search, list_sources"]
+        Input["Read text, local file or allowed HTTPS URL"]
+        Chunks["Split into chunks of at most 200 tokens"]
+        DocEmbedding["Embed document chunks"]
+        QueryEmbedding["Embed the search query"]
+        Model["Shared local model on CPU: all-MiniLM-L6-v2"]
+        Results["Return passages, source URIs and similarity scores"]
+        MCP -->|ingest| Input
+        Input --> Chunks --> DocEmbedding
+        MCP -->|search| QueryEmbedding
+        Model -.-> DocEmbedding
+        Model -.-> QueryEmbedding
+    end
+
+    subgraph Database["Docker container: database"]
+        PG["PostgreSQL + pgvector: sources, chunks and 384-dimensional vectors"]
+    end
+
+    Claude -->|MCP requests over stdio| MCP
+    DocEmbedding -->|Store or replace a document| PG
+    QueryEmbedding -->|Find nearest chunks using cosine distance| PG
+    MCP -->|list_sources: read metadata and chunk counts| PG
+    PG -->|Search results| Results
+    Results -->|MCP response over stdio| Claude
+    PG --- Volume["Persistent Docker volume: postgres_data"]
+    Cache["Host directory: .cache/models"] -.->|Model files mounted into the container| Model
+```
+
+The document and query embedding steps share one model instance per server
+process. Documents are embedded during ingestion; each search embeds only its
+query. PostgreSQL retrieves matching chunks, and Claude uses the returned
+evidence to write an answer. Ingest acknowledgements and source listings also
+return through the MCP connection; the diagram highlights the search response.
+
 | File | Responsibility |
 | --- | --- |
 | `src/server.ts` | Register MCP tools, validate inputs and format responses. |
