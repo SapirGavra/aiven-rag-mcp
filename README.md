@@ -53,8 +53,16 @@ background server is not needed for this stdio connection. For a direct attached
 Compose run that also starts the database dependency, use `docker compose run
 --rm -T server`; stdout is the MCP protocol stream, not a chat interface.
 
-A clean installation has not yet been timed. First-run duration depends on image
-and model downloads; full-corpus ingestion is a separate step below.
+On 2026-11-08, a fresh clone with an empty model cache and a new database reached
+a successful Claude Code stdio ingest/search response in 160.3 seconds. This run
+used cached Docker build layers. A supplementary `--no-cache` image build took
+155 seconds and its integration check passed; the whole verification session,
+including both builds and progress updates, took 363.6 seconds (about 6 minutes).
+Docker, Git and authenticated Claude Code were already installed, and base images
+were available locally. Claude was tested in non-interactive print mode with an
+explicit MCP config. These timings do not include first-time image downloads,
+account sign-in or full-corpus ingestion, and are not a guarantee for every
+machine or network.
 
 ## Connect Claude Code
 
